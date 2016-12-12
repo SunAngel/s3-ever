@@ -3,9 +3,9 @@
 #Simple static site generator
 # $1 - file name
 
-cd `dirname $0`
+cd `dirname $0`/../
 
-FILE=`basename "$1"`
+FILE=`basename "$REQUEST_URI"`
 
 [ -z "$FILE" ] && FILE="index"
 
@@ -13,7 +13,7 @@ FILE=`basename "$1"`
 [ -f "./data/$FILE" ] || FILE="404"
 
 cat "./data/header.htm" >  "./cache/$FILE"
-cat "./data/$FILE.htm"  >> "./cache/$FILE"
+cat "./data/$FILE"  >> "./cache/$FILE"
 cat "./data/footer.htm" >> "./cache/$FILE"
 
 
