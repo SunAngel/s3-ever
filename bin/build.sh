@@ -13,12 +13,12 @@ FILE=`basename "$REQUEST_URI"`
 #Well, we assume, that file 404 does exists
 [ -f "./data/$FILE" ] || FILE="404"
 
-cat "./data/header.htm" >  "./cache/$FILE"
-cat "./data/$FILE"  >> "./cache/$FILE"
-cat "./data/footer.htm" >> "./cache/$FILE"
+cat "./data/header.htm" >  "./cache/${FILE}.htm"
+cat "./data/$FILE"  >> "./cache/${FILE}.htm"
+cat "./data/footer.htm" >> "./cache/${FILE}.htm"
 
 
 echo "Content-type: text/html"
 echo ""
-cat "./cache/$FILE"
+cat "./cache/${FILE}.htm"
 #env
