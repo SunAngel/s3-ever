@@ -7,6 +7,8 @@ cd `dirname $0`
 
 FILE=`basename "$1"`
 
+[ -z "$FILE" ] && FILE="index"
+
 #Well, we assume, that file 404 does exists
 [ -f "./data/$FILE" ] || FILE="404"
 
