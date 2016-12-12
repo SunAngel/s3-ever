@@ -6,34 +6,57 @@ cd `dirname $0`/../
 ############
 ## Config ##
 ############
-#Directory where script will store compiled files
-CACHE_DIR="./cache"
-#Directory, where original files are stored
-DATA_DIR="./data"
+. ./conf/config.def
 
-#Different pages
-PAGE_HEADER="./data/default/header.htm"
-PAGE_FOOTER="./data/default/footer.htm"
-PAGE_404="./data/default/404"
-PAGE_INDEX="./data/default/index"
+[ -f ./conf/config ] && . ./conf/config
 
-[ -f ./conf/conf ] && . ./conf/conf
+###############
+## Functions ##
+###############
 
+send_page () {
+	# Output page
+	echo "Content-type: text/html"
+	echo ""
+	cat "$CACHE_DIR/${PAGE}${CACHE_EXT}"
+	#env
+}
 
-FILE=`basename "$REQUEST_URI"`
+build_file () {
+	# Create static page
+	cat "$PAGE_HEADER" >  "$CACHE_DIR/${PAGE}${CACHE_EXT}"
+	if [ -z "$CONTENT_FILTER" ]; then
+		cat "$FILE"  >> "$CACHE_DIR/${PAGE}${CACHE_EXT}"
+	else
+		$CONTENT_FILTER < "$FILE"  >> "$CACHE_DIR/${PAGE}${CACHE_EXT}"
+	fi
+	cat "$PAGE_FOOTER" >> "$CACHE_DIR/${PAGE}${CACHE_EXT}"
+}
 
-[ -z "$FILE" ] && FILE="index"
-[ "$FILE" = '/' ] && FILE="index"
+##########
+## Main ##
+##########
 
-#Well, we assume, that file 404 does exists
-[ -f "./data/$FILE" ] || FILE="404"
+PAGE=`basename "$REQUEST_URI"`
 
-cat "./data/header.htm" >  "./cache/${FILE}.htm"
-cat "./data/$FILE"  >> "./cache/${FILE}.htm"
-cat "./data/footer.htm" >> "./cache/${FILE}.htm"
+#Is it index?
+if [ -z "$PAGE" -o "$PAGE" = '/' ]; then 
+	PAGE="index"
+	FILE=$PAGE_INDEX
+else 
+	FILE="$DATA_DIR/${PAGE}${DATA_EXT}"
+fi
 
+#Well, we assume, that 404 page does exists
+if [ ! -f "$FILE" ]; then
+	FILE=$PAGE_404
+	PAGE=404
+	# Do not rebuild 404 page if there is some already
+	if [ -f "$CACHE_DIR/${PAGE}${CACHE_EXT}" ]; then
+		send_page
+		exit;
+	fi
+fi
 
-echo "Content-type: text/html"
-echo ""
-cat "./cache/${FILE}.htm"
-#env
+build_file
+send_page

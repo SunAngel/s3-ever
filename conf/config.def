@@ -5,6 +5,16 @@ CACHE_DIR="./cache"
 #Directory, where original files are stored
 DATA_DIR="./data"
 
+#Use some application to modify content file on the fly
+CONTENT_FILTER=
+#Use pandoc to convert Markdown to html
+#CONTENT_FILTER="pandoc"
+
+#Extension for cache files
+CACHE_EXT=".htm"
+#Extension for content files
+DATA_EXT=".htm"
+
 #Different pages
 PAGE_HEADER="./data/default/header.htm"
 PAGE_FOOTER="./data/default/footer.htm"
