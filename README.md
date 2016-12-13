@@ -17,7 +17,8 @@ This repo has folowing scripts:
 
 ## Configuration
 Script search for configuration file in 2 locations: `conf/config.def` and `conf/config`. First file contains default values and you shouldn't change it. 
-At this moment following configuration options are supported:
+
+At this moment following configuration variables are supported:
 * `DATA_DIR` - Directory, where script will search for content files. Default: "./data".
 * `DATA_EXT` - Extension for content files. Default: ".htm".
 * `CACHE_DIR` - Directory, where script will place generated pages. Default: "./cache".
@@ -27,3 +28,37 @@ At this moment following configuration options are supported:
 * `PAGE_FOOTER` - Footer file path. Default: "./data/default/footer.htm".
 * `PAGE_404` - 404 page file path. Default: "./data/default/404".
 * `PAGE_INDEX` - Index page file path. Default: "./data/default/index".
+
+## Webserver configuration
+
+You can just configure webserver to send all page requests to `bin/build.sh` but it isn't the way you should use static page generator. Better way is to ask webserver to search page in `$CAHE_DIR` directory ("/cache/", by default) and if page is missing, then ask script to generate it and send to user. 
+One possible way to do it is marking `bin/build.sh` as 404 page handler (`server.error-handler-404` in lighttpd config). For example there is my lighttpd config for it:
+```cpp
+# Tell lighttpd that bin/build.sh should be treaded as CGI programm
+cgi.assign = ( "bin/build.sh" => "" )
+
+
+#Where our site is located
+server.document-root  = "/var/www/sunx.me/"
+#If file isn't foud, ask S3-Ever for it
+server.error-handler-404 = "/bin/build.sh"
+
+url.rewrite-once = (
+# Search for some files there, where they are placed (like images, css and so on)
+	"^(/pub/.*)$"  => "$1",
+	"^(/img/.*)$" => "/pub/$1",
+	"^(/css/.*)$" => "/pub/$1",
+	"^(/favicon.*)$" => "/pub/img/$1",
+
+# Search for pages in cache directory. Do not forget about extension
+# Also treat index separately.
+	"^(/)$"     => "/cache/index.htm",
+	"^(/.*)$"     => "/cache/$1.htm",
+)
+```
+
+## Issues and ToDo
+
+* [ ] In case of page not found, set server responce status as 404
+* [ ] Add ability to change title, based on content page (Some sort of templates, via sed, maybe)
+
