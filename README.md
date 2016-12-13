@@ -59,6 +59,6 @@ url.rewrite-once = (
 
 ## Issues and ToDo
 
-* [ ] In case of page not found, set server responce status as 404
+* [X] In case of page not found, set server response status as 404
 * [ ] Add ability to change title, based on content page (Some sort of templates, via sed, maybe)
 

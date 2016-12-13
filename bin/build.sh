@@ -51,6 +51,9 @@ fi
 if [ ! -f "$FILE" ]; then
 	FILE=$PAGE_404
 	PAGE=404
+
+	# Set response status to 404
+	echo "Status: 404 Not Found"
 	# Do not rebuild 404 page if there is some already
 	if [ -f "$CACHE_DIR/${PAGE}${CACHE_EXT}" ]; then
 		send_page
